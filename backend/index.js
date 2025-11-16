@@ -15,7 +15,7 @@ app.use(
     credentials: true,
   })
 );
-const PORT = process.env.PORT || 4999;
+const PORT = process.env.PORT;
 app.use(express.json());
 app.use(cookieParser());
 app.use("/api/auth", authRouter);
