@@ -5,33 +5,38 @@ import authRouter from "./routers/authRoutes.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRouter from "./routers/userRoutes.js";
-import geminiResponse from "./gemini.js";
+
 dotenv.config();
 
 const app = express();
+
+const allowedOrigins = [
+  "http://localhost:5174",
+  "https://silly-cheesecake-40b237.netlify.app",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
-const PORT = process.env.PORT;
+
 app.use(express.json());
 app.use(cookieParser());
+
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
-// app.get("/", async (req, res) => {
-//   let prompt = req.query.prompt;
-//   let data = await geminiResponse(prompt);
-//   res.json(data);
-// });
+const PORT = process.env.PORT || 5000;
 
-// app.get("/", (req, res) => {
-//   res.send("Hello Wold!");
-// });
-
-app.listen(PORT, (req, res) => {
+app.listen(PORT, () => {
   connectDB();
-  console.log(`Server running on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
